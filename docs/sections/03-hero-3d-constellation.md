@@ -68,3 +68,7 @@ Run it on a branch and review the diff before merging. Init adds its own CSS var
 ## Previous hero
 
 The earlier canvas "constellation" hero is still in `src/components/motion/constellation.tsx` (with `src/lib/logo-mesh.ts`), no longer used on the page. To switch back, replace `<SpaceHero />` in `src/app/page.tsx` with the old hero markup from git history.
+
+## Phones in landscape
+
+When the hero is shorter than 560px and wider than 1.5:1 (a phone on its side), stacking the sculpture above the copy leaves it a thin strip, so the hero switches to a side-by-side layout (`data-side="1"` on `.sh-root`): copy on the left (56% width), sculpture on the right, sized to the full height under the nav. The giant backdrop word and the "Move through the stars" cue are hidden there, and under 340px of height the small eyebrow label is hidden too so the buttons always fit. Logic: `sideRect()` and the `side` branch of `relayout()` in `liquid-sculpture-hero.tsx`.

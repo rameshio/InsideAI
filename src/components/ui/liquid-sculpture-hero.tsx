@@ -1309,6 +1309,27 @@ const DEFAULTS = {
 
 /** The sculpture sits centred in the band between the nav and the copy,
  *  as wide as the hero (it may bleed off the sides on small screens). */
+/** Hero heights below this, at a ratio wider than SIDE_MIN_RATIO, use the side-by-side layout. */
+const SIDE_MAX_H = 560;
+const SIDE_MIN_RATIO = 1.5;
+
+/** Side-by-side layout: the sculpture fills the right part of the hero, below the nav. */
+function sideRect(
+  w: number,
+  h: number,
+  aspect: number,
+  nav: HTMLElement | null,
+): Rect {
+  const top = nav ? nav.offsetTop + nav.offsetHeight + 8 : 12;
+  const bandH = Math.max(80, h - top - 12);
+  let rw = w * 0.44;
+  if (rw / aspect > bandH * 0.92) rw = bandH * 0.92 * aspect;
+  const rh = rw / aspect;
+  const cx = w * 0.74;
+  const cy = top + bandH / 2;
+  return { x: cx - rw / 2, y: cy - rh / 2, w: rw, h: rh };
+}
+
 function computeRect(
   w: number,
   h: number,
@@ -1421,6 +1442,17 @@ const CSS = `
   .sh-btn{height:48px}
   .sh-content{padding-bottom:40px}
   .sh-credit{right:auto;left:50%;transform:translateX(-50%)}
+}
+.sh-root[data-side="1"] .sh-content{grid-template-columns:1fr;gap:14px;width:56%;padding-bottom:clamp(16px,6cqh,32px)}
+.sh-root[data-side="1"] .sh-aside{justify-self:start;padding-bottom:0}
+.sh-root[data-side="1"] .sh-h1{font-size:clamp(30px,min(5.2cqw,13cqh),64px)}
+.sh-root[data-side="1"] .sh-body{margin-bottom:16px}
+.sh-root[data-side="1"] .sh-eyebrow{margin-bottom:10px}
+.sh-root[data-side="1"] .sh-backdrop,.sh-root[data-side="1"] .sh-hint{display:none}
+@container (max-height:340px){
+  .sh-root[data-side="1"] .sh-eyebrow{display:none}
+  .sh-root[data-side="1"] .sh-body{margin-bottom:12px}
+  .sh-root[data-side="1"] .sh-btn{height:42px}
 }
 @media (prefers-reduced-motion:reduce){
   .sh-hint::before{animation:none}
@@ -1688,6 +1720,48 @@ export default function SculptureHero(props: SculptureHeroProps) {
     if (loadFonts) injectFonts();
   }, [loadFonts]);
 
+  /** Places the fallback image, backdrop word and hint, then sizes the engine. */
+  const layoutPieces = React.useCallback(
+    (
+      root: HTMLElement,
+      rect: Rect,
+      w: number,
+      h: number,
+      band: { top: number; bottom: number } | null,
+    ) => {
+      const mob = w < 640;
+      const bd = backdropRef.current;
+      if (bd && band) {
+        const chars = Math.max(1, (bd.textContent || "").length);
+        bd.style.fontSize =
+          Math.min(
+            (band.bottom - band.top) * 0.95,
+            (w * 0.92) / (chars * 0.56),
+          ) + "px";
+        bd.style.top = (band.top + band.bottom) / 2 + "px";
+      }
+      const img = imgRef.current;
+      if (img) {
+        img.style.left = rect.x + "px";
+        img.style.top = rect.y + "px";
+        img.style.width = rect.w + "px";
+        img.style.height = rect.h + "px";
+      }
+      const hintEl = hintRef.current;
+      if (hintEl) {
+        // the portrait phone sculpture runs into the copy: no room for the cue there
+        hintEl.style.display = mob && aspectRef.current < 1.3 ? "none" : "";
+        hintEl.style.left = clamp(rect.x + rect.w / 2, 80, w - 80) + "px";
+        hintEl.style.top =
+          Math.min(rect.y + rect.h * 0.95, (band ? band.bottom : h) - 20) +
+          "px";
+      }
+      engineRef.current?.resize(w, h, rect);
+      root.dataset.laid = "1";
+    },
+    [],
+  );
+
   const relayout = React.useCallback(() => {
     const root = rootRef.current;
     if (!root) return;
@@ -1698,8 +1772,18 @@ export default function SculptureHero(props: SculptureHeroProps) {
       mobileRef.current = mob;
       setIsMobile(mob);
     }
+    // short, wide screens (a phone in landscape): too little height to stack the
+    // sculpture over the copy, so the copy takes the left and the sculpture the right
+    const side = h < SIDE_MAX_H && w / h > SIDE_MIN_RATIO;
+    if (side) root.dataset.side = "1";
+    else delete root.dataset.side;
     const nav = navRef.current;
     const content = contentRef.current;
+    if (side) {
+      const rect = sideRect(w, h, aspectRef.current, nav);
+      layoutPieces(root, rect, w, h, null);
+      return;
+    }
     const band = {
       top: nav ? nav.offsetTop + nav.offsetHeight + 8 : 16,
       bottom: content ? content.offsetTop - 8 : h,
@@ -1708,32 +1792,8 @@ export default function SculptureHero(props: SculptureHeroProps) {
     if (mob && aspectRef.current < 1.3 && content)
       band.bottom += content.offsetHeight * 0.3;
     const rect = computeRect(w, h, aspectRef.current, band, layout.current);
-    const bd = backdropRef.current;
-    if (bd) {
-      const chars = Math.max(1, (bd.textContent || "").length);
-      bd.style.fontSize =
-        Math.min((band.bottom - band.top) * 0.95, (w * 0.92) / (chars * 0.56)) +
-        "px";
-      bd.style.top = (band.top + band.bottom) / 2 + "px";
-    }
-    const img = imgRef.current;
-    if (img) {
-      img.style.left = rect.x + "px";
-      img.style.top = rect.y + "px";
-      img.style.width = rect.w + "px";
-      img.style.height = rect.h + "px";
-    }
-    const hintEl = hintRef.current;
-    if (hintEl) {
-      // the portrait phone sculpture runs into the copy: no room for the cue there
-      hintEl.style.display = mob && aspectRef.current < 1.3 ? "none" : "";
-      hintEl.style.left = clamp(rect.x + rect.w / 2, 80, w - 80) + "px";
-      hintEl.style.top =
-        Math.min(rect.y + rect.h * 0.95, band.bottom - 20) + "px";
-    }
-    engineRef.current?.resize(w, h, rect);
-    root.dataset.laid = "1";
-  }, []);
+    layoutPieces(root, rect, w, h, band);
+  }, [layoutPieces]);
 
   // engine lifecycle (re-created only when the image changes)
   React.useEffect(() => {

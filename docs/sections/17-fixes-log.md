@@ -32,6 +32,7 @@ The Codex build passed typecheck, lint, its 11 unit tests and the smoke test, an
 | Footer logo was preloaded like an above-the-fold image | `preload` only for the header logo |
 | `compact` newsletter variant had no styles | added `.newsletter.compact` |
 | Hero logo flashed at full size in the top-left on refresh (before the script placed it) | fallback image, backdrop word and hint stay hidden until the first layout pass sets `data-laid` |
+| Phone in landscape: sculpture squeezed into a thin strip, overlapping the backdrop word | side-by-side hero layout on short, wide screens (copy left, sculpture right) |
 
 ## Redesign changes (summary)
 
