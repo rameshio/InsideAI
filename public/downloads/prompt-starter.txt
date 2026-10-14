@@ -1,0 +1,9 @@
+Inside AI — Useful Prompt Starter
+
+Goal: [What I want to achieve]
+Context: [Relevant background and constraints]
+Audience: [Who this is for]
+Output: [Format and length]
+Quality check: Flag assumptions and claims that need verification.
+
+Review all output before use.

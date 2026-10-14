@@ -1,0 +1,145 @@
+/*
+ * Space hero (src/components/space-hero.tsx).
+ * The sky reaches up behind the sticky glass header so the stars continue
+ * under it, and fades into the page at the bottom.
+ */
+
+.space-hero {
+  position: relative;
+  isolation: isolate;
+}
+.space-sky {
+  position: absolute;
+  inset: calc(-1 * var(--header-h)) 0 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* almost pure black, like the reference footage; a faint lift at the top */
+  background:
+    radial-gradient(120% 70% at 50% 0%, #05070d 0%, #010104 60%, #000 100%),
+    #000;
+  mask-image: linear-gradient(#000 82%, transparent);
+}
+.space-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 70% 50%; /* keep the nebula in view on narrow screens */
+  transform-origin: 75% 50%;
+  animation: sky-drift 60s ease-in-out infinite alternate;
+}
+@keyframes sky-drift {
+  from {
+    transform: scale(1.04);
+  }
+  to {
+    transform: scale(1.12) translate(-1.5%, 0.8%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .space-photo {
+    animation: none;
+    transform: scale(1.04);
+  }
+}
+/* Darkens the lower band so the copy stays readable over the bright nebula. */
+.space-sky::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 45% at 85% 100%, rgba(0, 0, 0, 0.7), transparent 70%),
+    linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent 45%);
+}
+.space-stars {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Restyle the sculpture hero to the site ---------- */
+.space-hero .sh-root {
+  z-index: 1;
+  background: transparent; /* let the sky show through the canvas */
+}
+.space-hero .sh-backdrop {
+  color: rgba(61, 184, 255, 0.06);
+}
+.space-hero .sh-accent {
+  font-style: normal;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-shadow: 0 0 32px rgba(61, 184, 255, 0.45);
+}
+.space-hero .sh-h1 {
+  font-weight: 600;
+  letter-spacing: -0.05em;
+}
+.space-hero .sh-eyebrow {
+  font-family: var(--font-display), system-ui, sans-serif;
+  color: var(--accent-2);
+  opacity: 1;
+}
+.space-hero .sh-body {
+  color: var(--ink-2);
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.8);
+  opacity: 1;
+}
+.space-hero .sh-btn {
+  background: linear-gradient(
+    135deg,
+    var(--accent-2),
+    var(--accent) 45%,
+    var(--accent-deep)
+  );
+  background-size: 160% 100%;
+  color: var(--accent-ink);
+  font-weight: 600;
+  box-shadow:
+    0 10px 30px -12px var(--glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  transition:
+    transform 0.35s var(--ease-spring),
+    box-shadow 0.35s var(--ease-out),
+    background-position 0.5s;
+}
+.space-hero .sh-btn:hover {
+  transform: translateY(-2px);
+  background-position: 100% 0;
+  box-shadow:
+    0 16px 40px -12px var(--glow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.space-hero .sh-btn:active {
+  transform: scale(0.97);
+}
+.space-hero .sh-txt {
+  border-bottom-color: rgba(143, 216, 255, 0.4);
+}
+.space-hero .sh-txt:hover {
+  color: var(--accent);
+}
+.space-hero .sh-hint {
+  color: var(--accent-2);
+  opacity: 0.7;
+}
+
+/* Load-in, then drift up and dim as the hero scrolls away. */
+.space-hero .sh-content > * {
+  animation: hero-in 0.9s var(--ease-out) both;
+}
+.space-hero .sh-content > :nth-child(2) {
+  animation-delay: 0.15s;
+}
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .space-hero .sh-content {
+      animation: hero-exit linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 90%;
+    }
+  }
+}

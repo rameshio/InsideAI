@@ -1,3 +1,14 @@
 # OriginKit reference collection: owner's private reference only.
 # Its license forbids redistributing it, so it must never be committed or pushed.
 references/
+node_modules/
+.next/
+.env*
+!.env.example
+*.tsbuildinfo
+test-results/
+playwright-report/
+.qa/
+# graphify knowledge-graph cache (generated, machine-local)
+graphify-out/
+src/graphify-out/

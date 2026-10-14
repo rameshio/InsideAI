@@ -1,0 +1,56 @@
+/*
+ * Design tokens. One accent (the logo's electric blue), one neutral family
+ * (near-black, like deep space), one radius system:
+ *   cards / panels  -> --radius-card (18px)
+ *   inputs / tiles  -> --radius-sm   (12px)
+ *   buttons / chips -> --radius-pill (999px)
+ * The brand is dark-only by design (the logo is a light-emitting mark).
+ */
+:root {
+  color-scheme: dark;
+
+  --bg: #010104;
+  --bg-raised: #05070f;
+  --surface: #090d1a;
+  --surface-2: #0d1326;
+  --line: rgba(110, 170, 255, 0.13);
+  --line-strong: rgba(110, 180, 255, 0.3);
+
+  --ink: #eaf3ff;
+  --ink-2: #b3c3df;
+  --ink-3: #8597b8;
+
+  --accent: #3db8ff;
+  --accent-2: #8fd8ff;
+  --accent-deep: #1677ff;
+  --accent-ink: #021122;
+  --glow: rgba(61, 184, 255, 0.45);
+  --glow-soft: rgba(61, 184, 255, 0.14);
+
+  --radius-card: 18px;
+  --radius-sm: 12px;
+  --radius-pill: 999px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* fonts: --font-display and --font-sans come from next/font in layout.tsx */
+  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace; /* code only */
+
+  --text-xs: 0.75rem; /* 12px: the smallest size used anywhere */
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+
+  --space-section: clamp(4.5rem, 3rem + 5vw, 8rem);
+  --header-h: 72px;
+
+  /* z-index scale */
+  --z-backdrop: -1;
+  --z-raised: 1;
+  --z-header: 40;
+  --z-menu: 45;
+  --z-progress: 50;
+  --z-skip: 60;
+}

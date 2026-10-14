@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+/* Design system, split by concern. See docs/sections/README.md for a map. */
+@import "../styles/tokens.css";
+@import "../styles/base.css";
+@import "../styles/home.css";
+@import "../styles/space-hero.css";
+@import "../styles/pages.css";
+@import "../styles/responsive.css";
+@import "../styles/motion.css";

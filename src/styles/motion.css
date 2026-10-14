@@ -1,0 +1,169 @@
+/*
+ * Motion layer.
+ *
+ * - Scroll-driven animations (CSS `animation-timeline`) for reveals, the hero
+ *   exit, the header and the progress bar. No scroll listeners. Browsers
+ *   without support simply show everything in place.
+ * - View transitions between pages (src/app/template.tsx) and between
+ *   archive results (src/app/[collection]/page.tsx).
+ * - Everything collapses to static under prefers-reduced-motion.
+ */
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    .scroll-progress {
+      animation: progress linear both;
+      animation-timeline: scroll(root);
+    }
+    .site-header {
+      animation: header-solid linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 160px;
+    }
+    /* The hero copy drifts up and dims as you scroll past it. */
+    .hero-copy {
+      animation: hero-exit linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 90%;
+    }
+  }
+
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: reveal-up linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 28%;
+    }
+    /* Children rise in with a slight 3D pitch, one after another. */
+    .stagger {
+      perspective: 1400px;
+    }
+    .stagger > * {
+      transform-origin: 50% 100%;
+      animation: rise-3d linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 26%;
+    }
+    .stagger > :nth-child(2) {
+      animation-range: entry 8% cover 34%;
+    }
+    .stagger > :nth-child(3) {
+      animation-range: entry 16% cover 42%;
+    }
+    .stagger > :nth-child(4) {
+      animation-range: entry 24% cover 50%;
+    }
+    /* Section backgrounds parallax very slightly. */
+    .creator-visual img {
+      animation: drift linear both;
+      animation-timeline: view();
+    }
+  }
+}
+
+@keyframes progress {
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes header-solid {
+  to {
+    background: rgba(1, 1, 4, 0.82);
+    border-bottom-color: var(--line);
+  }
+}
+@keyframes hero-exit {
+  to {
+    opacity: 0.15;
+    translate: 0 -80px;
+  }
+}
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    translate: 0 56px;
+  }
+}
+@keyframes rise-3d {
+  from {
+    opacity: 0;
+    translate: 0 80px;
+    rotate: x 18deg;
+    scale: 0.96;
+  }
+}
+@keyframes drift {
+  from {
+    translate: 0 -24px;
+  }
+  to {
+    translate: 0 24px;
+  }
+}
+
+/* ---------- View transitions ---------- */
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+::view-transition-old(.page) {
+  animation: page-out 220ms var(--ease-in) both;
+}
+::view-transition-new(.page) {
+  animation: page-in 560ms var(--ease-out) 140ms both;
+}
+::view-transition-old(.results) {
+  animation: page-out 160ms var(--ease-in) both;
+}
+::view-transition-new(.results) {
+  animation: page-in 420ms var(--ease-out) 80ms both;
+}
+@keyframes page-out {
+  to {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.985);
+    filter: blur(6px);
+  }
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.985);
+    filter: blur(8px);
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .marquee-track {
+    animation: none !important;
+  }
+  .topic-marquee {
+    overflow-x: auto;
+  }
+  [data-tilt] {
+    transform: none !important;
+  }
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}

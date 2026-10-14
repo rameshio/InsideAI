@@ -1,0 +1,39 @@
+{
+  "name": "inside-ai",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "npm run content:validate && next build",
+    "start": "next start",
+    "lint": "eslint src scripts tests next.config.ts",
+    "typecheck": "tsc --noEmit",
+    "content:validate": "tsx scripts/validate-content.ts",
+    "content:new": "tsx scripts/new-content.ts",
+    "test": "tsx --test tests/*.test.ts"
+  },
+  "dependencies": {
+    "lenis": "^1.3.26",
+    "lucide-react": "^0.577.0",
+    "next": "16.4.0",
+    "next-mdx-remote": "^6.0.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "remark-gfm": "^4.0.1",
+    "yaml": "^2.9.1",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.0",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "16.4.0",
+    "prettier": "^3.9.10",
+    "tailwindcss": "4.3.3",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

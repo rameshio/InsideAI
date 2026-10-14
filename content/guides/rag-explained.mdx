@@ -1,0 +1,52 @@
+---
+slug: rag-explained
+title: "How AI Uses Your Documents: RAG Explained"
+summary: Follow the path from a question to a document-grounded answer.
+published: 2026-10-13
+author: Ramesh Badugu
+draft: false
+demo: true
+tags:
+  - AI
+  - beginners
+readingTime: 2
+related:
+  - videos/rag-in-a-minute
+  - resources/document-workflow
+category: Tutorials
+lastReviewed: 2026-10-13
+sources:
+  - name: Retrieval-Augmented Generation paper
+    url: https://arxiv.org/abs/2005.11401
+---
+
+## The idea in one sentence
+Retrieval-augmented generation (RAG) gives a language model relevant material from a collection of documents before it generates an answer.
+
+## Follow the flow
+1. **Prepare:** extract text and divide it into meaningful passages.
+2. **Index:** store passages so a search system can find them.
+3. **Retrieve:** find passages relevant to a user’s question.
+4. **Generate:** include the passages in the model’s context and ask it to answer with citations.
+5. **Review:** check that the answer actually follows from the passages.
+
+## A small prototype
+Start with a few public documents. Use plain text search first so you can inspect every retrieved passage. Add embeddings only when they improve retrieval for your questions.
+
+~~~python
+def retrieve(query, passages):
+    terms = set(query.lower().split())
+    ranked = sorted(
+        passages,
+        key=lambda p: len(terms & set(p.lower().split())),
+        reverse=True,
+    )
+    return ranked[:3]
+~~~
+
+This deliberately simple example illustrates retrieval, not a production search engine. It ignores synonyms, access controls, and ranking quality.
+
+## What RAG does not guarantee
+Retrieved documents may be incomplete or stale. A model can still contradict a source or cite a passage that does not support its claim. Document instructions can also be malicious. Keep access permissions outside the model and treat retrieved text as data.
+
+<Callout>RAG does not inherently retrain the model. It supplies context at answer time.</Callout>
